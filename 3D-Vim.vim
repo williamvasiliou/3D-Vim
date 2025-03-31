@@ -373,8 +373,8 @@ class Camera
 	enddef
 
 	def newCamera(Translate: float, Rotate: Vec, fovy: float, aspect: float)
-		var Projection: Mat = Mat.newPerspective(fovy, aspect, 0.1, 100.0)
-		var ModelView: Mat = Mat.newTranslate(Vec.new(0.0, 0.0, -Translate, 1.0)).Pitch(-Rotate.y * PI).Yaw(Rotate.x * PI).Scale(Vec.new(0.5, 0.5, 0.5, 1.0))
+		const Projection: Mat = Mat.newPerspective(fovy, aspect, 0.1, 100.0)
+		const ModelView: Mat = Mat.newTranslate(Vec.new(0.0, 0.0, -Translate)).Pitch(-Rotate.y * PI).Yaw(Rotate.x * PI).Scale(Vec.new(0.5, 0.5, 0.5, 1.0))
 		this.camera = Projection.Mul(ModelView)
 	enddef
 
@@ -408,11 +408,7 @@ class Viewport
 	enddef
 
 	def Clear()
-		for row: number in range(this.height)
-			for column: number in range(this.width)
-				this.buffer[row][column] = Fragment.new()
-			endfor
-		endfor
+		this.buffer->map((_, row: list<Fragment>) => row->map((_, _) => Fragment.new()))
 
 		const angle: float = (localtime() % 40) / 20.0
 		this.camera = Camera.newCamera(6.0, Vec.new(2.0 * angle, angle), this.fovy, this.aspect)
